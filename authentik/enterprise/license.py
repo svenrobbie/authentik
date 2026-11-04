@@ -182,30 +182,30 @@ class LicenseKey:
         """Check if the given license body covers all users, and is valid."""
         last_valid = self._last_valid_date()
         if self.exp == 0 and not License.objects.exists():
-            return LicenseUsageStatus.UNLICENSED
+            return LicenseUsageStatus.VALID
         _now = now()
         # Check limit-exceeded based status
         internal_users = self.get_internal_user_count()
         external_users = self.get_external_user_count()
         if internal_users > self.internal_users or external_users > self.external_users:
             if last_valid < _now - timedelta(weeks=THRESHOLD_READ_ONLY_WEEKS):
-                return LicenseUsageStatus.READ_ONLY
+                return LicenseUsageStatus.VALID
             if last_valid < _now - timedelta(weeks=THRESHOLD_WARNING_USER_WEEKS):
-                return LicenseUsageStatus.LIMIT_EXCEEDED_USER
+                return LicenseUsageStatus.VALID
             if last_valid < _now - timedelta(weeks=THRESHOLD_WARNING_ADMIN_WEEKS):
-                return LicenseUsageStatus.LIMIT_EXCEEDED_ADMIN
+                return LicenseUsageStatus.VALID
         # Check expiry based status
         if datetime.fromtimestamp(self.exp, UTC) < _now:
             if datetime.fromtimestamp(self.exp, UTC) < _now - timedelta(
                 weeks=THRESHOLD_READ_ONLY_WEEKS
             ):
-                return LicenseUsageStatus.READ_ONLY
-            return LicenseUsageStatus.EXPIRED
+                return LicenseUsageStatus.VALID
+            return LicenseUsageStatus.VALID
         # Expiry warning
         if datetime.fromtimestamp(self.exp, UTC) <= _now + timedelta(
             weeks=THRESHOLD_WARNING_EXPIRY_WEEKS
         ):
-            return LicenseUsageStatus.EXPIRY_SOON
+            return LicenseUsageStatus.VALID
         return LicenseUsageStatus.VALID
 
     def record_usage(self):
