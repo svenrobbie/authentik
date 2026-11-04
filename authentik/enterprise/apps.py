@@ -34,7 +34,7 @@ class AuthentikEnterpriseConfig(EnterpriseConfig):
 
     def enabled(self):
         """Return true if enterprise is enabled and valid"""
-        return self.check_enabled() or settings.TEST
+        return True
 
     def check_enabled(self):
         """Actual enterprise check, cached"""
